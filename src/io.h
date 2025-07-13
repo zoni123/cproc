@@ -1,3 +1,4 @@
+/* (c) 2025 Sebastian-Marian Badea - GPLv3 License */
 #ifndef IO_H
 #define IO_H
 

@@ -1,3 +1,4 @@
+/* (c) 2025 Sebastian-Marian Badea - GPLv3 License */
 #include <dirent.h>
 #include <stdlib.h>
 #include <termios.h>

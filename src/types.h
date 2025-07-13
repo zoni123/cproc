@@ -1,3 +1,4 @@
+/* (c) 2025 Sebastian-Marian Badea - GPLv3 License */
 #ifndef TYPES_H
 #define TYPES_H
 
