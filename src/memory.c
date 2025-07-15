@@ -8,8 +8,8 @@
 void free_process(process_t *proc)
 {
     if (proc) {
-        if (proc->stat) {
-            fclose(proc->stat);
+        if (proc->stat_file) {
+            fclose(proc->stat_file);
         }
         if (proc->stat_path) {
             free(proc->stat_path);

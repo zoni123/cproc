@@ -1,5 +1,5 @@
 .PHONY: clean
 build:
-	gcc -o main main.c io.c memory.c -Wall -Wextra
+	gcc -o cproc main.c io.c memory.c -Wall -Wextra
 clean:
-	rm -f *.o main
+	rm -f *.o cproc

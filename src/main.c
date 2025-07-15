@@ -30,7 +30,7 @@ bool check_dir_validity(struct dirent *ent)
 void refresh(void)
 {
     printf("\033[H\033[J");
-    printf("PID\tCOMMAND\t\tSTATE\tPPID\tUTIME\tSTIME\tPRIOR\tSTART\tVSIZE\tUSER\n");
+    printf("PID\tCOMMAND\t\tSTATE\tPPID\tUTIME\tSTIME\tPRIOR\tNICE\tSTART\t\tVSIZE\t\tUSER\n");
 }
 
 int main(void)
@@ -94,9 +94,9 @@ int main(void)
                 }
 
                 strcat(proc[dir_size]->stat_path, "/stat");
-                proc[dir_size]->stat = fopen(proc[dir_size]->stat_path, "r");
+                proc[dir_size]->stat_file = fopen(proc[dir_size]->stat_path, "r");
 
-                if (!proc[dir_size]->stat) {
+                if (!proc[dir_size]->stat_file) {
                     perror("No stat file");
                     cleanup(proc, dir_size, dir, &original);
                     return STAT_ERROR;

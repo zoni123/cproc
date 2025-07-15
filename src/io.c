@@ -42,14 +42,20 @@ int check_exit(char *exit_buffer, int buff_len)
 void get_process_info(process_t **proc, int *dir_size, char *stat_content, struct passwd *user)
 {
     for (int i = 0; i < 40; i++) {
-        if (i == 0 || i == 1 || i == 2 || i == 3 || i == 13 || i == 14 || i == 17 || i == 22 || i == 23) {
-            fscanf(proc[*dir_size]->stat, "%s", stat_content);
+        fscanf(proc[*dir_size]->stat_file, "%s", stat_content);
+        if (i == PID || i == COMMAND || i == STATE || i == PPID || i == UTIME || i == STIME || i == PRIORITY || i == NICE || i == START_TIME || i == VSIZE) {
             printf("%.*s", TRUNC_CHAR, stat_content);
-            if (i == 1) {
+            if (i == 1 || i == 21 || i == 22) {
                 if (strlen(stat_content) < 8) {
                     printf("\t");
                 } else if (strlen(stat_content) >= TRUNC_CHAR) {
                     printf("...");
+                }
+
+                while (stat_content[strlen(stat_content) - 1] != ')' && i == 1) {
+                    if (fscanf(proc[*dir_size]->stat_file, "%s", stat_content) != 1) {
+                        break;
+                    }
                 }
             }
             printf("\t");
