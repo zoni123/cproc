@@ -10,9 +10,10 @@
 #include <sys/stat.h>
 #include <termios.h>
 #include <unistd.h>
-#include "types.h"
 #include "io.h"
 #include "memory.h"
+#include "sorting.h"
+#include "types.h"
 
 bool check_dir_validity(struct dirent *ent)
 {
@@ -30,11 +31,12 @@ bool check_dir_validity(struct dirent *ent)
 void refresh(void)
 {
     printf("\033[H\033[J");
-    printf("PID\tCOMMAND\t\tSTATE\tPPID\tUTIME\tSTIME\tPRIOR\tNICE\tSTART\t\tVSIZE\t\tUSER\n");
+    printf("PID\tCOMMAND\t\tSTATE\tPPID\tUTIME\tSTIME\tNICE\tSTART\t\tVSIZE\tUSER\n");
 }
 
 int main(void)
 {
+    int criteria = PID;
     DIR *dir = opendir("/proc");
     struct termios original;
     enable_raw_mode(&original);
@@ -52,13 +54,14 @@ int main(void)
         struct passwd *user = NULL;
         struct stat status_uid;
 
+        buff_len = read(STDIN_FILENO, exit_buffer, EXIT_BUFFER_SIZE);        
         if (!check_exit(exit_buffer, buff_len)) {
             cleanup(proc, dir_size, dir, &original);
             return SUCCESS;
         }
 
+        get_sorting_criteria(exit_buffer, buff_len, &criteria);
         refresh();
-
         rewinddir(dir);
         while ((ent = readdir(dir))) {
             if (check_dir_validity(ent)) {
@@ -72,15 +75,6 @@ int main(void)
 
                 proc[dir_size] = malloc(sizeof(process_t));
                 if (!proc[dir_size]) {
-                    perror("Malloc failed");
-                    cleanup(proc, dir_size, dir, &original);
-                    return MALLOC_FAILED;
-                }
-
-                proc[dir_size]->pid = atoi(ent->d_name);
-                proc[dir_size]->stat_path = malloc(strlen("/proc/") + strlen(ent->d_name) + strlen("/stat") + 1);
-
-                if (!proc[dir_size]->stat_path) {
                     perror("Malloc failed");
                     cleanup(proc, dir_size, dir, &original);
                     return MALLOC_FAILED;
@@ -104,6 +98,9 @@ int main(void)
                 get_process_info(proc, &dir_size, stat_content, user);
             }
         }
+        sort_processes(proc, dir_size, criteria);
+        display_processes(proc, dir_size);
+        display_keys();
         usleep(REFRESH_RATE);
         free_process_list(proc, dir_size);
     }

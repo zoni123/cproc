@@ -25,16 +25,18 @@ typedef enum {
     PPID = 3,
     UTIME = 13,
     STIME = 14,
-    PRIORITY = 17,
     NICE = 18,
     START_TIME = 21,
-    VSIZE = 22
+    VSIZE = 22,
+    USER = -1
 } stat_attributes_t;
 
 typedef struct {
     FILE *stat_file;
-    pid_t pid;
-    char *stat_path;
+    char state, stat_path[STAT_LINE_LENGTH], command[STAT_LINE_LENGTH], user[STAT_LINE_LENGTH];
+    pid_t pid, ppid;
+    unsigned long utime, stime, start_time, vsize;
+    int nice;
 } process_t;
 
 #endif
