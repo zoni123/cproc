@@ -1,12 +1,15 @@
 /* (c) 2025 Sebastian-Marian Badea - GPLv3 License */
+#include <dirent.h>
 #include <fcntl.h>
 #include <pwd.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
 #include "types.h"
+#include "sorting.h"
 
 void enable_raw_mode(struct termios *original) {
     struct termios raw;
@@ -38,6 +41,19 @@ int check_exit(char *exit_buffer, int buff_len)
         }
     }
     return NO_EXIT;
+}
+
+bool check_dir_validity(struct dirent *ent)
+{
+    if (ent->d_type == DT_DIR) {
+        for (size_t i = 0; i < strlen(ent->d_name); i++) {
+            if (ent->d_name[i] < '0' || ent->d_name[i] > '9') {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
 }
 
 void get_sorting_criteria(char *buff, int buff_len, int *criteria)
@@ -75,6 +91,19 @@ void get_sorting_criteria(char *buff, int buff_len, int *criteria)
                 case '0':
                     *criteria = USER;
                     break;
+            }
+        }
+    }
+}
+
+void get_sorting_order(char *buff, int buff_len, int *order)
+{
+    if (buff_len > 0) {
+        for (int i = 0; i < buff_len; i++) {
+            if (buff[i] == 'a' || buff[i] == 'A') {
+                *order = 1;
+            } else if (buff[i] == 'd' || buff[i] == 'D') {
+                *order = -1;
             }
         }
     }
@@ -149,14 +178,33 @@ void display_processes(process_t **proc, int dir_size)
         } else {
             printf("%luB\t", proc[i]->vsize);
         }
-        printf("%s", proc[i]->user);
+        if (!strcmp(proc[i]->user, "root")) {
+            printf("\033[1;35m%s\033[0m", proc[i]->user);
+        } else {
+            printf("%s", proc[i]->user);
+        }
         printf("\n");
     }
 }
 
 void display_keys(void)
 {
-    printf("\nq: exit\n1: sort by PID\t\t2: sort by COMMAND\t3: sort by STATE\n"
+    printf("\nq: exit\t\t\ta: ascending\t\td: descending\n1: sort by PID\t\t2: sort by COMMAND\t3: sort by STATE\n"
         "4: sort by PPID\t\t5: sort by UTIME\t6: sort by STIME\n7: sort by NICE\t\t"
         "8: sort by START TIME\t9: sort by VSIZE\n0: sort by USER\n");
+}
+
+void refresh(void)
+{
+    printf("\033[H\033[J");
+    printf("PID\tCOMMAND\t\tSTATE\tPPID\tUTIME\tSTIME\tNICE\tSTART\t\tVSIZE\tUSER\n");
+}
+
+void show_all(process_t **proc, int dir_size, int criteria, int order)
+{
+    refresh();
+    sort_processes(proc, dir_size, criteria, order);
+    display_processes(proc, dir_size);
+    display_keys();
+    usleep(REFRESH_RATE);
 }

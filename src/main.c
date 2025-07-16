@@ -15,28 +15,9 @@
 #include "sorting.h"
 #include "types.h"
 
-bool check_dir_validity(struct dirent *ent)
-{
-    if (ent->d_type == DT_DIR) {
-        for (size_t i = 0; i < strlen(ent->d_name); i++) {
-            if (ent->d_name[i] < '0' || ent->d_name[i] > '9') {
-                return false;
-            }
-        }
-        return true;
-    }
-    return false;
-}
-
-void refresh(void)
-{
-    printf("\033[H\033[J");
-    printf("PID\tCOMMAND\t\tSTATE\tPPID\tUTIME\tSTIME\tNICE\tSTART\t\tVSIZE\tUSER\n");
-}
-
 int main(void)
 {
-    int criteria = PID;
+    int criteria = PID, order = 1;
     DIR *dir = opendir("/proc");
     struct termios original;
     enable_raw_mode(&original);
@@ -61,7 +42,7 @@ int main(void)
         }
 
         get_sorting_criteria(exit_buffer, buff_len, &criteria);
-        refresh();
+        get_sorting_order(exit_buffer, buff_len, &order);
         rewinddir(dir);
         while ((ent = readdir(dir))) {
             if (check_dir_validity(ent)) {
@@ -98,10 +79,7 @@ int main(void)
                 get_process_info(proc, &dir_size, stat_content, user);
             }
         }
-        sort_processes(proc, dir_size, criteria);
-        display_processes(proc, dir_size);
-        display_keys();
-        usleep(REFRESH_RATE);
+        show_all(proc, dir_size, criteria, order);
         free_process_list(proc, dir_size);
     }
     closedir(dir);

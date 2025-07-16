@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 
-#define STAT_LINE_LENGTH 1024
+#define STAT_LINE_LENGTH 256
 #define REFRESH_RATE 1000000
 #define TRUNC_CHAR 12
 #define EXIT_BUFFER_SIZE 64
