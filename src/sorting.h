@@ -35,9 +35,9 @@ int compare_start_time(const void *a, const void *b);
 
 int compare_start_time_reverse(const void *a, const void *b);
 
-int compare_vsize(const void *a, const void *b);
+int compare_rss(const void *a, const void *b);
 
-int compare_vsize_reverse(const void *a, const void *b);
+int compare_rss_reverse(const void *a, const void *b);
 
 int compare_user(const void *a, const void *b);
 

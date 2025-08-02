@@ -28,7 +28,7 @@ typedef enum {
     STIME = 14,
     NICE = 18,
     START_TIME = 21,
-    VSIZE = 22,
+    RSS = 23,
     USER = -1
 } stat_attributes_t;
 
@@ -36,7 +36,7 @@ typedef struct {
     FILE *stat_file;
     char state, stat_path[STAT_LINE_LENGTH], command[STAT_LINE_LENGTH], user[STAT_LINE_LENGTH];
     pid_t pid, ppid;
-    unsigned long utime, stime, start_time, vsize;
+    unsigned long utime, stime, start_time, rss;
     int nice;
 } process_t;
 

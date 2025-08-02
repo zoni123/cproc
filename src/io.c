@@ -94,7 +94,7 @@ void get_sorting_criteria(char *buff, int buff_len, int *criteria)
                     *criteria = START_TIME;
                     break;
                 case '9':
-                    *criteria = VSIZE;
+                    *criteria = RSS;
                     break;
                 case '0':
                     *criteria = USER;
@@ -207,8 +207,8 @@ void get_process_info(process_t **proc, int *dir_size, char *stat_content, struc
             case START_TIME:
                 proc[*dir_size]->start_time = atoi(stat_content);
                 break;
-            case VSIZE:
-                proc[*dir_size]->vsize = atoi(stat_content);
+            case RSS:
+                proc[*dir_size]->rss = atoi(stat_content) * sysconf(_SC_PAGESIZE);
                 break;
         }
     }
@@ -237,19 +237,25 @@ void display_processes(process_t **proc, int dir_size, int argc, char **argv)
         printf("%lu\t", proc[i]->stime);
         printf("%d\t", proc[i]->nice);
         printf("%lu\t\t", proc[i]->start_time);
-        if (proc[i]->vsize > 1024 * 1024) {
-            printf("%.2lfMB\t", proc[i]->vsize * 1.0 / 1024 / 1024);
-            if (proc[i]->vsize * 1.0 / 1024 / 1024 < 100) {
+        if (proc[i]->rss > 1024 * 1024) {
+            if (proc[i]->rss > 1024 * 1024 * 512) {
+                printf("\033[1;31m%.2lfMB\033[0m\t", proc[i]->rss * 1.0 / 1024 / 1024);
+            } else if (proc[i]->rss > 1024 * 1024 * 256) {
+                printf("\033[1;33m%.2lfMB\033[0m\t", proc[i]->rss * 1.0 / 1024 / 1024);
+            } else {
+                printf("%.2lfMB\t", proc[i]->rss * 1.0 / 1024 / 1024);
+            }
+            if (proc[i]->rss * 1.0 / 1024 / 1024 < 100) {
                 printf("\t");
             }
-        } else if (proc[i]->vsize > 1024) {
-            printf("%.2lfKB\t", proc[i]->vsize * 1.0 / 1024);
-            if (proc[i]->vsize * 1.0 / 1024 < 100) {
+        } else if (proc[i]->rss > 1024) {
+            printf("%.2lfKB\t", proc[i]->rss * 1.0 / 1024);
+            if (proc[i]->rss * 1.0 / 1024 < 100) {
                 printf("\t");
             }
         } else {
-            printf("%luB\t", proc[i]->vsize);
-            if (proc[i]->vsize * 1.0 < 1000) {
+            printf("%luB\t", proc[i]->rss);
+            if (proc[i]->rss * 1.0 < 1000) {
                 printf("\t");
             }
         }
@@ -266,14 +272,14 @@ void display_keys(void)
 {
     printf("\nq: exit\t\t\ta: ascending\t\td: descending\n\n1: sort by PID\t\t2: sort by COMMAND\t3: sort by STATE\n"
         "4: sort by PPID\t\t5: sort by UTIME\t6: sort by STIME\n7: sort by NICE\t\t"
-        "8: sort by START TIME\t9: sort by VSIZE\n0: sort by USER\n\nk: kill process\t\tt: terminate process\t"
+        "8: sort by START TIME\t9: sort by RAM\n0: sort by USER\n\nk: kill process\t\tt: terminate process\t"
         "s: suspend process\nc: continue process\n");
 }
 
 void refresh(void)
 {
     printf("\033[H\033[J");
-    printf("PID\tCOMMAND\t\tSTATE\tPPID\tUTIME\tSTIME\tNICE\tSTART\t\tVSIZE\t\tUSER\n");
+    printf("\033[30;47mPID\tCOMMAND\t\tSTATE\tPPID\tUTIME\tSTIME\tNICE\tSTART\t\tRAM\t\tUSER\n\033[0m");
 }
 
 void show_all(process_t **proc, int dir_size, int criteria, int order, int argc, char **argv)

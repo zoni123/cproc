@@ -82,14 +82,14 @@ int compare_start_time_reverse(const void *a, const void *b)
     return (*(process_t **)b)->start_time - (*(process_t **)a)->start_time;
 }
 
-int compare_vsize(const void *a, const void *b)
+int compare_rss(const void *a, const void *b)
 {
-    return (*(process_t **)a)->vsize - (*(process_t **)b)->vsize;
+    return (*(process_t **)a)->rss - (*(process_t **)b)->rss;
 }
 
-int compare_vsize_reverse(const void *a, const void *b)
+int compare_rss_reverse(const void *a, const void *b)
 {
-    return (*(process_t **)b)->vsize - (*(process_t **)a)->vsize;
+    return (*(process_t **)b)->rss - (*(process_t **)a)->rss;
 }
 
 int compare_user(const void *a, const void *b)
@@ -161,11 +161,11 @@ void sort_processes(process_t **proc, int dir_size, int criteria, int order)
                 qsort(proc, dir_size, sizeof(process_t *), compare_start_time_reverse);
             }
             break;
-        case VSIZE:
+        case RSS:
             if (order == 1) {
-                qsort(proc, dir_size, sizeof(process_t *), compare_vsize);
+                qsort(proc, dir_size, sizeof(process_t *), compare_rss);
             } else {
-                qsort(proc, dir_size, sizeof(process_t *), compare_vsize_reverse);
+                qsort(proc, dir_size, sizeof(process_t *), compare_rss_reverse);
             }
             break;
         case USER:
