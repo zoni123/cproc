@@ -36,6 +36,6 @@ void display_keys(void);
 
 void refresh(void);
 
-void show_all(process_t **proc, int dir_size, int criteria, int order);
+void show_all(process_t **proc, int dir_size, int criteria, int order, int argc, char **argv);
 
 #endif

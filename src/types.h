@@ -15,7 +15,8 @@ typedef enum {
     PROC_OPEN_ERROR,
     MALLOC_FAILED,
     STAT_ERROR,
-    NO_EXIT
+    NO_EXIT,
+    ARGS_ERROR
 } error_codes_t;
 
 typedef enum {

@@ -216,9 +216,13 @@ void get_process_info(process_t **proc, int *dir_size, char *stat_content, struc
     (*dir_size)++;
 }
 
-void display_processes(process_t **proc, int dir_size)
+void display_processes(process_t **proc, int dir_size, int argc, char **argv)
 {
     for (int i = 0; i < dir_size; i++) {
+        if (argc == 2 && strcmp(proc[i]->user, argv[1])) {
+            continue;
+        }
+
         printf("%d\t", proc[i]->pid);
         if (strlen(proc[i]->command) < 8) {
             printf("%.*s\t\t", TRUNC_CHAR, proc[i]->command);
@@ -272,11 +276,11 @@ void refresh(void)
     printf("PID\tCOMMAND\t\tSTATE\tPPID\tUTIME\tSTIME\tNICE\tSTART\t\tVSIZE\t\tUSER\n");
 }
 
-void show_all(process_t **proc, int dir_size, int criteria, int order)
+void show_all(process_t **proc, int dir_size, int criteria, int order, int argc, char **argv)
 {
     refresh();
     sort_processes(proc, dir_size, criteria, order);
-    display_processes(proc, dir_size);
+    display_processes(proc, dir_size, argc, argv);
     display_keys();
     usleep(REFRESH_RATE);
 }

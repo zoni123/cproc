@@ -16,8 +16,13 @@
 #include "sorting.h"
 #include "types.h"
 
-int main(void)
+int main(int argc, char **argv)
 {
+    if (argc > 2) {
+        printf("Usage: %s [user]\n", argv[0]);
+        return ARGS_ERROR;
+    }
+
     int criteria = PID, order = 1;
     DIR *dir = opendir("/proc");
     struct termios original;
@@ -86,7 +91,7 @@ int main(void)
                 get_process_info(proc, &dir_size, stat_content, user);
             }
         }
-        show_all(proc, dir_size, criteria, order);
+        show_all(proc, dir_size, criteria, order, argc, argv);
         free_process_list(proc, dir_size);
     }
     closedir(dir);
