@@ -6,7 +6,9 @@ A lightweight process manager for Linux written in C.
 ## Build/Clean
 
 The only prerequisite is GCC.
+
 `make` to build the executable
+
 `make clean` to remove the executable
 
 ## Usage
